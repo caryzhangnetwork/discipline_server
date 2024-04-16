@@ -11,7 +11,6 @@ def login(data):
         target_user = session.execute(select_query, {'username': data['username']})
         target_user = target_user.fetchone()
         session.commit()
-        print("target_user ", target_user)
         if target_user:
             if target_user[2] == data['pw']:
                 return {
@@ -56,24 +55,31 @@ def get_total_score(user_id):
 
 # edit user total score with user id and a specific score board recorad
 def update_user_daily_score(session, last_score, current_score_board_obj, user_id):
-    print("update_user_daily_score target_user first", last_score, current_score_board_obj, user_id)
+    try:
+        user_select_query = text("SELECT * FROM USER WHERE id = :id")
+        target_user = session.execute(user_select_query, {'id': user_id}).fetchone()
+        if current_score_board_obj.reward_type == 1:
+            new_daily_score = target_user.daily_score - last_score + current_score_board_obj.score
+        else:
+            new_daily_score = target_user.daily_score - last_score - current_score_board_obj.score
+        update_user_query = text("UPDATE user SET daily_score = :daily_score WHERE id = :id")
+        session.execute(update_user_query, {'id': user_id, 'daily_score': new_daily_score})
+    except Exception as e:
+        return "query fail"
 
-    user_select_query = text("SELECT * FROM USER WHERE id = :id")
-    target_user = session.execute(user_select_query, {'id': user_id}).fetchone()
-    print("update_user_daily_score target_user ", target_user)
-    if current_score_board_obj.reward_type == 1:
-        print("update_user_daily_score 1 daily_score", target_user.daily_score)
-        print("update_user_daily_score 1 last_score", last_score)
-        print("update_user_daily_score 1 current_score_board_obj", current_score_board_obj.score)
-        new_daily_score = target_user.daily_score - last_score + current_score_board_obj.score
-        print("target_user.daily_score - last_score + current_score_board_obj.score")
-        print("update_user_daily_score 1 new_daily_score", new_daily_score)
-    else:
-        print("update_user_daily_score 2 daily_score ", target_user.daily_score)
-        print("update_user_daily_score 2 last_score ", last_score)
-        print("update_user_daily_score 2 current_score_board_obj ", current_score_board_obj.score)
-        new_daily_score = target_user.daily_score - last_score - current_score_board_obj.score
-        print("target_user.daily_score - last_score + current_score_board_obj.score")
-        print("update_user_daily_score 2 new_daily_score", new_daily_score)
-    update_user_query = text("UPDATE user SET daily_score = :daily_score WHERE id = :id")
-    session.execute(update_user_query, {'id': user_id, 'daily_score': new_daily_score})
+
+def update_all_user_total_score():
+    print("update_all_user_total_score ")
+    try:
+        session = create_session()
+        user_select_query = text("SELECT * FROM USER")
+        users = session.execute(user_select_query).fetchall()
+        for user in users:
+            total_score = user.total_score + user.daily_score
+            daily_score = 0
+            update_user_query = text("UPDATE user SET daily_score = :daily_score, total_score = :total_score WHERE id = :id")
+            session.execute(update_user_query, {'id': user.id, 'total_score': total_score, 'daily_score': daily_score})
+        # this is from daily scheduler, will commit the session every time update the user data
+        session.commit()
+    except Exception as e:
+        return "query fail"
