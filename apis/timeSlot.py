@@ -12,4 +12,8 @@ def create_time_slot():
     return time_slot_control.create_time_slot(data)
 
 
+@timeSlotApis.route('/api/createDurationTimeSlot', methods=['POST'])
+def createDurationTimeSlot():
+    data = request.get_json()
+    return time_slot_control.createDurationTimeSlot(data)
 

@@ -4,19 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6ea4fe13-6c53-4bcb-b3f0-8c5717cfc44f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scheduler/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scheduler/daily_schedule.py" afterDir="false" />
+    <list default="true" id="6ea4fe13-6c53-4bcb-b3f0-8c5717cfc44f" name="Changes" comment="add duration time slot functionality">
+      <change afterPath="$PROJECT_DIR$/controler/action_type.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/allModel.py" beforeDir="false" afterPath="$PROJECT_DIR$/allModel.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apis/scoreBoard.py" beforeDir="false" afterPath="$PROJECT_DIR$/apis/scoreBoard.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apis/timeSlot.py" beforeDir="false" afterPath="$PROJECT_DIR$/apis/timeSlot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apis/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/apis/user.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controler/score_board.py" beforeDir="false" afterPath="$PROJECT_DIR$/controler/score_board.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controler/timeSlot.py" beforeDir="false" afterPath="$PROJECT_DIR$/controler/timeSlot.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controler/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/controler/user.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/actionType.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/actionType.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/scoreBoard.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/scoreBoard.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/job_batch/daily_schedule.py" beforeDir="false" afterPath="$PROJECT_DIR$/job_batch/daily_schedule.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utils/tools.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/tools.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -46,7 +45,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "main",
     "last_opened_file_path": "/Users/macbookpro/Desktop/discipline_server",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+    "settings.editor.selected.configurable": "reference.settingsdialog.project.grazie"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -71,5 +70,10 @@
       <updated>1705495770784</updated>
     </task>
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="add job_batch" />
+    <MESSAGE value="add duration time slot functionality" />
+    <option name="LAST_COMMIT_MESSAGE" value="add duration time slot functionality" />
   </component>
 </project>

@@ -42,14 +42,18 @@ def get_model(filePath):
     module_name = filePath.replace('.py', '').replace('/', '.')
     module = importlib.import_module(module_name)
     table_name = ''
+    class_name = ''
     columns = ()
+    if hasattr(module, 'className'):
+        class_name = getattr(module, 'className')
     if hasattr(module, 'tableName'):
         table_name = getattr(module, 'tableName')
     if hasattr(module, 'columns'):
         columns = getattr(module, 'columns')
     return {
+        'className': class_name,
         'tableName': table_name,
-        'columns': columns
+        'columns': columns,
     }
 
 

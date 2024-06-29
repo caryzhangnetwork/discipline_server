@@ -6,7 +6,7 @@ over_night_counter = 5
 # datetime format transform "Sun Mar 31 2024 06:01:25" to "2024-03-31 06:01:25"
 def date_time_format_transform(date_time):
     temp_date_time = re.sub(r" GMT[+-]\d{4}.*$", "", date_time)
-    temp_date_time = "Sun Apr 8 2024 05:30:25"
+    # temp_date_time = "Sun Apr 8 2024 05:30:25"
     return datetime.datetime.strptime(temp_date_time, '%a %b %d %Y %H:%M:%S')
 
 

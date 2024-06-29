@@ -17,3 +17,9 @@ def create_time_slot():
 def get_total_score():
     data = request.get_json()
     return user_control.get_total_score(data['userId'])
+
+
+@userApis.route('/api/updateUserScore', methods=['POST'])
+def update_user_using_score():
+    data = request.get_json()
+    return user_control.update_user_using_score(data)

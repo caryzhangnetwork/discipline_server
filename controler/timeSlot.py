@@ -4,7 +4,8 @@ from allModel import create_session
 from utils import tools
 from sqlalchemy import text
 from controler.user import update_user_daily_score
-from controler.score_board import get_target_score_board, get_over_night_score_board
+from controler.score_board import get_target_score_board, get_duration_score_board
+from controler.action_type import get_all_daily_action_type
 import datetime
 
 
@@ -14,10 +15,6 @@ def create_time_slot(data):
         target_score_board_obj_id = -1
         last_score = 0
         score = 0
-
-        ac_select_query = text("SELECT id, counting_type FROM action_type WHERE id = :actionType")
-        target_action_type = session.execute(ac_select_query, {'actionType': data['actionType']}).fetchone()
-        counting_type = target_action_type[1]
 
         create_date_time = tools.date_time_format_transform(data['createDate'])
         time_slots = get_sorted_time_slot_for_today(session, create_date_time, data['createBy'], data['actionType'])
@@ -82,6 +79,9 @@ def get_sorted_time_slot_for_today(session, date_time, user_id, action_type):
         day_start = datetime.datetime.strptime(f'{str(today)} {overnight_time}', "%Y-%m-%d %H:%M")
         day_end = datetime.datetime.strptime(f'{str(tomorrow)} {overnight_time}', "%Y-%m-%d %H:%M")
 
+    print("day_start ", day_start)
+    print("day_end ", day_end)
+
     ts_select_query = text("SELECT ts.id, ts.create_date, sb.reward_type, sb.score "
                            "FROM time_slot ts "
                            "JOIN score_board sb ON ts.score_id = sb.id "
@@ -95,24 +95,76 @@ def get_sorted_time_slot_for_today(session, date_time, user_id, action_type):
     return tools.sort_time_obj_list(1, time_slots)
 
 
+def createDurationTimeSlot (data):
+    try:
+        target_score_board_id = -1
+        score = 0
+        session = create_session()
+        total_last_score = 0
+        target_score_board_obj = get_duration_score_board(session, data['actionType'], data['duration'])
+        target_score_board_id = target_score_board_obj.id
+        if target_score_board_id != -1:
+            create_date_time = tools.date_time_format_transform(data['createDate'])
+            time_slots = get_sorted_time_slot_for_today(session, create_date_time, data['createBy'], data['actionType'])
+            if len(time_slots) != 0:
+                for time_slot in time_slots:
+                    total_last_score = total_last_score + time_slot.score
+                    delete_query = text(
+                        "DELETE FROM time_slot WHERE id = :time_slot_id")
+                    session.execute(delete_query, {'time_slot_id': time_slot.id})
+                score = target_score_board_obj.score - total_last_score
+                update_user_daily_score(session, total_last_score, target_score_board_obj, data['createBy'])
+            else:
+                score = target_score_board_obj.score
+                update_user_daily_score(session, total_last_score, target_score_board_obj, data['createBy'])
+
+            insert_query = text(
+                "INSERT INTO time_slot (create_date, score_id, create_by) VALUES (:create_date, :score_id, :create_by)")
+            session.execute(insert_query, {'create_date': create_date_time, 'score_id': target_score_board_id,
+                                   'create_by': data['createBy']})
+        session.commit()
+        return {
+            'status': 1,
+            'msg': "query success",
+            'score': score
+        }
+    except Exception as e:
+        print("An error occurred:", str(e))
+        return {
+            'status': 0,
+            'msg': "query fail",
+            'score': 0
+        }
+
+def remove_redundance_time_slot_for_all_users():
+    print("remove_redundance_time_slot_for_all_users ")
+    try:
+        session = create_session()
+        user_select_query = text("SELECT * FROM USER")
+        users = session.execute(user_select_query).fetchall()
+        overnight_time = str(tools.over_night_counter) + ":00"
+        today = datetime.date.today()
+        today_latest_date_time = datetime.datetime.strptime(f'{str(today)} {overnight_time}', "%Y-%m-%d %H:%M")
+        action_types_without_reward = get_all_daily_action_type()
+
+        all_delete_ids = []
+        for user in users:
+            for action_type in action_types_without_reward:
+                today_time_slots = get_sorted_time_slot_for_today(session, today_latest_date_time, user.id, action_type.id)
+                # get the score of last update time slot in the same action type within today(before over night)
+                length = len(today_time_slots)
+                if (length > 1):
+                    ids = [item.id for item in today_time_slots[:length-1]]
+                    all_delete_ids = all_delete_ids + ids
+
+        delete_query = text(f"DELETE FROM time_slot WHERE id IN ({', '.join(str(id) for id in all_delete_ids)});")
+        session.execute(delete_query)
 
 
+        session.commit()
+    except Exception as e:
+        return "query fail"
 
-
-
-# is not using right now, will add partial logic in night batch
-def over_night_time_slot_handler(session, create_time, time_slots, action_type):
-    # identify if current time is between 00:00 and before over nighttime
-    if tools.isAM(f'{create_time.hour}:{create_time.minute}') and create_time.hour > tools.over_night_counter:
-        # in the morning(next day)
-        if len(time_slots) == 0:
-            # if user don't have any record for this type in today
-            return get_over_night_score_board(session, action_type)
-        else:
-            return get_target_score_board(session, create_time, action_type)
-    else:
-        # still in today late night(today late night)
-        return get_target_score_board(session, create_time, action_type)
 
 
 

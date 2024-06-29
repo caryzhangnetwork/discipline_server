@@ -62,6 +62,7 @@ def update_user_daily_score(session, last_score, current_score_board_obj, user_i
             new_daily_score = target_user.daily_score - last_score + current_score_board_obj.score
         else:
             new_daily_score = target_user.daily_score - last_score - current_score_board_obj.score
+
         update_user_query = text("UPDATE user SET daily_score = :daily_score WHERE id = :id")
         session.execute(update_user_query, {'id': user_id, 'daily_score': new_daily_score})
     except Exception as e:
@@ -83,3 +84,31 @@ def update_all_user_total_score():
         session.commit()
     except Exception as e:
         return "query fail"
+
+
+def update_user_using_score(req):
+    print("update_user_score ")
+    try:
+        session = create_session()
+        user_select_query = text("SELECT * FROM USER WHERE  id = :id")
+        target_user = session.execute(user_select_query, {'id': req['userId']}).fetchone()
+
+        new_daily_score = target_user.daily_score - req['score']
+        new_total_score = target_user.total_score + new_daily_score
+
+        update_user_query = text("UPDATE user SET daily_score = :daily_score WHERE id = :id")
+        session.execute(update_user_query, {'id': req['userId'], 'daily_score': new_daily_score})
+
+        session.commit()
+        return {
+            'status': 1,
+            'msg': "query success",
+            'totalScore': new_total_score
+        }
+    except Exception as e:
+        print("An error occurred:", str(e))
+        return {
+            'status': 0,
+            'msg': "query fail",
+            'totalScore': 0
+        }
